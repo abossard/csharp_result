@@ -31,9 +31,7 @@ namespace ConsoleApp1
         public readonly TE Error;
     }
 
-    class MyException : Exception
-    {
-    }
+    
 
     class Program
     {
@@ -42,10 +40,16 @@ namespace ConsoleApp1
             var rand = new Random();
             return rand.NextDouble() >= 0.5 ? Result.Ok("Hi") : Result.FailureString(new Exception("Big freaking problem"));
         }
+        
+        static Result<string, Exception> TryToCreateResultWithoutHelper()
+        {
+            var rand = new Random();
+            return rand.NextDouble() >= 0.5 ? new("hi", null) : new(null, new Exception("Big freaking problem"));
+        }
 
         static void Main(string[] args)
         {
-            var result = TryToCreateResult();
+            var result = TryToCreateResultWithoutHelper();
             var message = result switch
             {
                 {IsSuccess: true, Data: var data} => $"Got some: {data}",
