@@ -9,7 +9,7 @@ namespace ConsoleApp1
             return new(data, null);
         }
 
-        public static Result<string, Exception> FailureString(Exception error)
+        public static Result<string, TE> FailureString<TE>(TE error) where TE : Exception
         {
             return new(null, error);
         }
