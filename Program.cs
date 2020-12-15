@@ -4,39 +4,52 @@ namespace ConsoleApp1
 {
     class Result
     {
-        public static Result<TD> Ok<TD>(TD data)
+        public static Result<TD, Exception> Ok<TD>(TD data)
         {
-            return new Result<TD>(data, true);
+            return new(data, null);
         }
 
-        public static Result<TD> Failure<TD>(TD data)
+        public static Result<string, Exception> FailureString(Exception error)
         {
-            return new Result<TD>(data, false);
+            return new(null, error);
         }
     }
 
-    class Result<TD> : Result
+    
+    
+    class Result<TD, TE> : Result where TE: Exception
     {
-        public Result(TD data, bool isSuccess)
+        public Result(TD data, TE error)
         {
             Data = data;
-            IsSuccess = isSuccess;
+            Error = error;
+            IsSuccess = error == null;
         }
 
         public readonly bool IsSuccess;
         public readonly TD Data;
+        public readonly TE Error;
+    }
+
+    class MyException : Exception
+    {
     }
 
     class Program
     {
+        static Result<string, Exception> TryToCreateResult()
+        {
+            var rand = new Random();
+            return rand.NextDouble() >= 0.5 ? Result.Ok("Hi") : Result.FailureString(new Exception("Big freaking problem"));
+        }
+
         static void Main(string[] args)
         {
-            var success = Result.Ok("YES");
-            var error = Result.Failure(new Exception());
-            var message = success switch
+            var result = TryToCreateResult();
+            var message = result switch
             {
                 {IsSuccess: true, Data: var data} => $"Got some: {data}",
-                {IsSuccess: false, Data: var errorData} => $"Oops {errorData}",
+                {IsSuccess: false, Error: var errorData} => $"Oops {errorData}",
             };
 
             Console.WriteLine(message);
